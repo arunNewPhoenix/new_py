@@ -8,7 +8,7 @@ STONE = '-'
 
 # Function to generate a random game map
 def generate_map(size, num_carrots, num_holes):
-    # Initialize an empty grid
+    # Initialize an empty grid filled with spaces
     grid = [[' ' for _ in range(size)] for _ in range(size)]
     
     # Place rabbit
@@ -16,11 +16,13 @@ def generate_map(size, num_carrots, num_holes):
     grid[rabbit_x][rabbit_y] = RABBIT
     
     # Place rabbit holes
+    rabbit_holes = []
     for _ in range(num_holes):
         hole_x, hole_y = random.randint(0, size - 1), random.randint(0, size - 1)
         while grid[hole_x][hole_y] != ' ':
             hole_x, hole_y = random.randint(0, size - 1), random.randint(0, size - 1)
         grid[hole_x][hole_y] = RABBIT_HOLE
+        rabbit_holes.append((hole_x, hole_y))
     
     # Place carrots
     for _ in range(num_carrots):
@@ -29,7 +31,14 @@ def generate_map(size, num_carrots, num_holes):
             carrot_x, carrot_y = random.randint(0, size - 1), random.randint(0, size - 1)
         grid[carrot_x][carrot_y] = CARROT
     
-    return grid, rabbit_x, rabbit_y
+    # Place stones in vacant locations
+    for x in range(size):
+        for y in range(size):
+            if grid[x][y] == ' ' and (x, y) not in rabbit_holes:
+                grid[x][y] = STONE
+    
+    return grid, rabbit_x, rabbit_y, rabbit_holes
+
 
 # Function to display the game map
 def display_map(grid):
@@ -40,16 +49,13 @@ def display_map(grid):
 def can_move(grid, x, y):
     return 0 <= x < len(grid) and 0 <= y < len(grid) and grid[x][y] != STONE
 
-
-
-
 # Main game loop
 def main():
     size = int(input("Enter the size of the game map: "))
     num_carrots = int(input("Enter the number of carrots: "))
     num_holes = int(input("Enter the number of rabbit holes: "))
     
-    grid, rabbit_x, rabbit_y = generate_map(size, num_carrots, num_holes)
+    grid, rabbit_x, rabbit_y, rabbit_holes = generate_map(size, num_carrots, num_holes)
     carrots_collected = 0
     
     while True:
@@ -105,4 +111,6 @@ def main():
             print("Invalid move! Try again.")
 
 if __name__ == "__main__":
-    main()        
+    main()
+
+  
